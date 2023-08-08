@@ -1,0 +1,16 @@
+/* @value light-colors: "./theme-light.module.css";
+@value 
+    light-bg1, light-bg2, light-bg3, 
+    light-accent1, light-accent2, light-accent3,
+    light-text1, light-text2, light-text3
+    from light-colors */
+
+/* @import '../../global.css'; */
+
+.normal {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px;
+  opacity: 1;
+  background-color: #0003;
+}
