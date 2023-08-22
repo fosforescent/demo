@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 
 import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+
+import { useTheme } from "@/components/theme-provider"
  
 import { Button } from "@/components/ui/button"
 import {
@@ -87,16 +87,16 @@ const HamburgerMenu = () => {
                   <CommandGroup heading="Navigation">
                     <CommandItem>
                       <SheetClose asChild>
-                   <Link href='/todo' onClick={toggleMenu}>
+                   <a href='/todo' onClick={toggleMenu}>
                       Inbox
-                    </Link>
+                    </a>
                                 </SheetClose>
                     </CommandItem>
                     <CommandItem>
                                 <SheetClose asChild>
-                   <Link href='/workflow' onClick={toggleMenu}>
+                   <a href='/workflow' onClick={toggleMenu}>
                      Workflows 
-                    </Link>
+                    </a>
                                 </SheetClose>
                     </CommandItem>
                     {/* <CommandItem>
@@ -119,9 +119,9 @@ const HamburgerMenu = () => {
                     <CommandItem>
                                 <SheetClose asChild>
 
-                      <Link href='/login' onClick={() => { toggleMenu(); localStorage.clear(); window.location.reload()}}>
+                      <a href='/login' onClick={() => { toggleMenu(); localStorage.clear(); window.location.reload()}}>
                         Logout 
-                      </Link>
+                      </a>
                                 </SheetClose>
                     </CommandItem>
                   </CommandGroup>
