@@ -2,6 +2,7 @@ import './App.css'
 
 import HamburgerMenu from '@/components/menu/HamburgerMenu'
 import { ThemeProvider } from "@/components/theme-provider"
+import Main from '@app' 
 
 function App() {
 
