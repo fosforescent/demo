@@ -7,9 +7,11 @@ run:
 install: 
 	npm ci
 
+.PHONY: build
 build:
 	npm run build
 
+.PHONY: test
 test-ci:
 	npm run test:ci
 
