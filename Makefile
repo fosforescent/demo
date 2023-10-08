@@ -1,7 +1,15 @@
-MAKE=make
-
 run-dev:
 	npm run dev
 
 run:
-	$(MAKE) run-dev
+	run-dev
+
+install: 
+	npm ci
+
+build:
+	npm run build
+
+test-ci:
+	npm run test:ci
+
