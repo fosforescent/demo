@@ -43,6 +43,9 @@ jobs:
 
     - name: Build app
       run: make build
+      
+    - name: check if build folder exists
+      run: ls -la build
 
     - name: Setup Pages
       uses: actions/configure-pages@v3 
