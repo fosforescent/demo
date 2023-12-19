@@ -1,0 +1,20 @@
+body {
+  --text1: #ddd;
+  --border1: #777;
+  --bg2: #222e;
+  --bg3: #111111ee;
+}
+
+:global div.dark {
+  box-shadow: 2px 2px 2px #2225;
+}
+
+:global .dark {
+  border-color: var(--border1);
+  color: var(--text1);
+  background-color: var(--bg2);
+}
+
+:global .tertiary-container.dark {
+  background-color: var(--bg3);
+}

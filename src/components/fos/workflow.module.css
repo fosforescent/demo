@@ -1,0 +1,6 @@
+.node-state-indicator {
+  width: 15px;
+  height: 15px;
+  background-color: aliceblue;
+  border-radius: 50%;
+}

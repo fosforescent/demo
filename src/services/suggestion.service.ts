@@ -1,5 +1,5 @@
 // https://jasonwatmore.com/post/2021/08/04/next-js-11-jwt-authentication-tutorial-with-example-app#api-users-authenticate-js
-import { publicRuntimeConfig } from '@/app/config'
+import { publicRuntimeConfig } from '@/config'
 
 import { fetchWrapper } from '../helpers/fetch-wrapper'
 

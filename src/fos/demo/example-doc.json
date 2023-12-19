@@ -1,0 +1,18 @@
+{
+  "nodes": {
+    "task2": {
+      "name": "task2"
+    },
+    "task1": {
+      "name": "task1"
+    },
+    "root": {
+      "name": "root",
+      "children": [
+        ["task", "task1"],
+        ["task", "task2"]
+      ]
+    }
+  }
+}
+
