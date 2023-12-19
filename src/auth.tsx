@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { userService } from '../services'
-import { useRouter } from 'react-router-dom'
+import { userService } from './services'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const AuthCheck = ({ children }: { children: React.ReactNode }) => {
 
@@ -12,14 +12,13 @@ export const AuthCheck = ({ children }: { children: React.ReactNode }) => {
 }
 
 const useAuthCheck  = () => {
-  const router = useRouter()
   const [authorized, setAuthorized] = useState(false)
 
+  const location = useLocation();
+  const pathname = location.pathname; 
 
+  const navigate = useNavigate();
 
-  const pathname = usePathname(); // Get current route
-
-  // Save pathname on component mount into a REF
   const savedPathNameRef = useRef(pathname);
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const useAuthCheck  = () => {
     // const validUser = user && userService.userValue.username === user.username
     if (!userService.userValue?.username && !publicPaths.includes(path) && !path.startsWith('/demo')) {
       setAuthorized(false)
-      router.push('/login')
+      navigate('/login')
     } else {
       setAuthorized(true)
     }

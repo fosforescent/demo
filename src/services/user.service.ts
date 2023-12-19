@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs'
 
 import { fetchWrapper } from '../helpers/fetch-wrapper'
 
-import { publicRuntimeConfig } from '@/app/config'
+import { publicRuntimeConfig } from '@/config'
 
 
 const baseUrl = `${publicRuntimeConfig.apiUrl}/users`
