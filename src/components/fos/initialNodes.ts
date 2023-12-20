@@ -15,7 +15,7 @@ export const initialNodes = {
   },
   subtask1: {
     value: {
-      description: "task1",
+      description: "subtask1",
     },
     content: [
       ["{description}", "{description}"],

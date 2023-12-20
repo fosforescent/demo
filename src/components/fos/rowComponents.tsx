@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 
 import { TrashIcon, PlayIcon, Folder } from "lucide-react"
@@ -10,17 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "../ui/button"
 
 
-export const NameView = ({
-    value,
-    updateValue
-  }: {
-    value: string
-    updateValue: (value: string) => void
-}) => {
-
-
-  return (<Input type="text" placeholder="" onChange={(e) => updateValue(e.target.value)} value={value} />)
-}
 
 export const StringRow = ({
   leftNode, 
@@ -40,38 +29,56 @@ export const StringRow = ({
   const matchesRight = rightNode.match(/^[\{](\w+)[\}]$/)
 
 
-
-
   if (!matchesRight || !matchesRight[1]){
     throw new Error(`right node for task should be reference to value object "{description}": ${rightNode}`)
   }
-  const [[parentLeft, parentRight], ...rest] = path
-  const parentValue = nodes[parentRight]?.value
+  const [[parentLeft, parentRight], ...rest] = path.slice().reverse() as [[string, string], ...[string, string][]]
+  const parentNode = nodes[parentRight]
+  const parentValue = parentNode?.value
 
   if (!parentValue) {
+    console.log('path', path, leftNode, rightNode, parentLeft, parentRight, path.slice().reverse() )
     throw new Error(`no parent value for ${parentRight} --- ${parentValue}... shouldn't have gotten here `)
   }
 
   const valueKey = matchesRight[1]
-  console.log('value', rightNode)
   const value = parentValue[valueKey]
 
+  const [textState, setTextState] = useState(value);
+  
+  useEffect(() => {
+    setTextState(value);
+  }, [value]);
+
+  // console.log('value', rightNode, valueKey, value, parentValue, textState)
+  // console.log('path', path, leftNode, rightNode, parentLeft, parentRight, path.slice().reverse() )
 
 
- 
-  const [textState, setTextState] = useState(value.description)
-
-
+  const [timer, setTimer] = useState(0);
+  useEffect(() => {
+    let handler: any = null
+    console.log('timer', timer)
+    if (timer > 0) {
+      handler = setTimeout(() => setTimer(timer + 1), 100)
+    } 
+    if (timer > 10) {
+      console.log('saveText', textState)
+      saveText(null)
+      setTimer(0)
+    }
+    return () => clearTimeout(handler)
+  }, [timer])
+  
   const changeText = (e: any ) => {
     console.log('changeText', e.target.value)
     setTextState(e.target.value)
+    setTimer(1)
   }
 
   const saveText = (e: any ) => {
-    updateNodes({...nodes, [parentRight]:  {...parentValue, value: { ...value, description: textState } } })
+    updateNodes({...nodes, [parentRight]:  {...parentNode, value: { [valueKey]: textState } } })
   }
 
-  console.log('value', value, textState)
 
   return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} /></div>)
 
@@ -94,7 +101,6 @@ export const ChecklistRow = ({
 
   const matchesRight = rightNode.match(/^[\{](\w+)[\}]$/)
 
-  console.log('value', rightNode)
   const value = nodes[rightNode]?.value
 
   if (matchesRight){
@@ -110,9 +116,11 @@ export const ChecklistRow = ({
 
   const [textState, setTextState] = useState(rightNodeObj.value.description)
 
+  useEffect(() => {
+    setTextState(rightNodeObj.value.description)
+  }, [rightNodeObj])
 
   const changeText = (e: any ) => {
-    console.log('changeText', e.target.value)
     setTextState(e.target.value)
   }
 
@@ -120,8 +128,7 @@ export const ChecklistRow = ({
     updateNodes({...nodes, [rightNode]:  {...rightNodeObj, value: { ...value, description: textState } } })
   }
 
-  console.log('value', value, textState)
-
+ 
   return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} /></div>)
 
 }
@@ -142,7 +149,7 @@ export const TaskRow = ({
 
   const matchesRight = rightNode.match(/^[\{](\w+)[\}]$/)
 
-  console.log('value', rightNode)
+  console.log('value [taskrow]', rightNode)
   const value = nodes[rightNode]?.value
 
   if (matchesRight){
@@ -158,6 +165,21 @@ export const TaskRow = ({
 
   const [textState, setTextState] = useState(rightNodeObj.value.description)
 
+  const [timer, setTimer] = useState(0);
+  useEffect(() => {
+    let handler: any = null
+    console.log('timer', timer)
+    if (timer > 0) {
+      handler = setTimeout(() => setTimer(timer + 1), 100)
+    } 
+    if (timer > 10) {
+      console.log('saveText', textState)
+      saveText(null)
+      setTimer(0)
+    }
+    return () => clearTimeout(handler)
+  }, [timer])
+
   const checkBox = () => {
     const oldValue = value
     const newValue = { ...value, status: value.status === 0 ? 1 : 0 }
@@ -170,13 +192,14 @@ export const TaskRow = ({
   const changeText = (e: any ) => {
     console.log('changeText', e.target.value)
     setTextState(e.target.value)
+    setTimer(1)
   }
 
   const saveText = (e: any ) => {
     updateNodes({...nodes, [rightNode]:  {...rightNodeObj, value: { ...value, description: textState } } })
   }
 
-  console.log('value', value, textState)
+  console.log('value [task row bottom]', value, textState)
 
   return (<div className='flex justify-center'><Checkbox checked={value.status === 1} style={{padding: '10px'}} onClick={checkBox} /><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} /></div>)
 
@@ -187,19 +210,59 @@ export const TaskRow = ({
 
 
 
-export const FolderRowMenu = ({ 
-  valueNode,
-  nodes
+export const ChecklistRowMenu = ({ 
+  leftNode,
+  nodes,
+  rightNode,
+  updateNodes,
+  path,
+  // updatePath,
 }: {
-  valueNode: string ,
+  leftNode: string,
+  rightNode: string,
+  path: [[string, string], ...[string, string][]],
+  // updatePath: (path: [[string, string], ...[string, string][]]) => void
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
+  updateNodes: (nodes: {[key: string]: { value?: any, content: [string, string][]}}) => void
 }) => {
 
+  const deleteNode = () => {
+    const [parentLeft, parentRight] = path[path.length - 1] as [string, string]
+    const parentNode = nodes[parentRight]
+    if (!parentNode) {
+      throw new Error(`no parent node for ${parentRight}... shouldn't have gotten here`)
+    }
+    const newContent = parentNode.content.filter((item) => item[0] !== leftNode || item[1] !== rightNode)
+    updateNodes({...nodes, [parentRight]: {...parentNode, content: newContent } })
+  }
+
+  const snipNode = () => {
+
+    const [parentLeft, parentRight] = path[path.length - 1] as [string, string]
+    const parentNode = nodes[parentRight]
+    const thisNode = nodes[rightNode]
+    if (!parentNode) {
+      throw new Error(`no parent node for ${parentRight}... shouldn't have gotten here`)
+    }
+    if (!thisNode) {
+      throw new Error(`no this node for ${rightNode}... shouldn't have gotten here`)
+    }
+    const thisContent = thisNode.content
+    const newContent = [
+      ...parentNode.content.filter((item) => item[0] !== leftNode || item[1] !== rightNode),
+      ...thisContent
+    ]
+    updateNodes({...nodes, [parentRight]: {...parentNode, content: newContent } })
+
+  }
+
+
+
   return (<div className='flex w-60 justify-around'>
-    <Button variant={"secondary"} className='bg-emerald-900'><QuestionMarkCircledIcon /></Button>
-    <Button variant={"secondary"} className='bg-emerald-900'><PlayIcon /></Button>
-    <Button variant={"destructive"}><TrashIcon /></Button>
-    <Button variant={"destructive"}><ComponentNoneIcon /></Button>
+    {/* <Button variant={"secondary"} className='bg-emerald-900'><QuestionMarkCircledIcon /></Button> */}
+    {/* <Button variant={"secondary"} className='bg-emerald-900'><PlayIcon /></Button> */}
+    <Button variant={"destructive"} onClick={snipNode}><ComponentNoneIcon /></Button>
+    <Button variant={"destructive"} onClick={deleteNode}><TrashIcon /></Button>
   </div>)
 }
 
@@ -240,83 +303,4 @@ export const FolderRow = ({
     <Input type="text" placeholder="" onChange={(e) => updateValue(e.target.value)} value={name} />
   </div>)
 }
-
-export const CoreFolderRow = ({
-  leftNode, 
-  rightNode,
-  updateRow,
-  nodes
-}: {
-  leftNode: {value?: any, content: [string, string][] },
-  rightNode: {value?: any, content: [string, string][] },
-  updateRow: (leftValue: {value?: any, content: [string, string][]}, rightValue: {value?: any, content: [string, string][]}) => void
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-}) => {
-
-  const updateValue = (newVal: string) => {
-    console.log('thest1')
-  }
-
-  // console.log('valueNode', rightNode)
-
-  const nameNodeId = rightNode.content.find((item) => item[0] === 'name')?.[1]
-
-  if(!nameNodeId) return (<div>error - no name provided</div>)
-
-  const contentNodeId = rightNode.content.find((item) => item[0] === 'content')?.[1] 
-
-  if(!contentNodeId) return (<div>error - no content provided</div>)
-
-  const name = nodes[nameNodeId]?.value
-
-  const numItems = rightNode.content.length
-
-  return (<div className="flex">
-    <div style={{padding: '10px 10px 10px 0', position: 'relative', fontSize: '.7rem'}}><Folder style={{position: 'absolute', top: 5, left: -10, width: '25px', height: '25px' }} />{numItems}</div>
-    <div>{name}</div>
-  </div>)
-}
-
-
-
-
-
-
-const NameRow = ({
-  left,
-  right,
-  dragging, 
-  nodes,
-  updateNodes,
-  appendToPath,
-  value,
-  updatePath,
-} : {
-  left: string,
-  right: string,
-  dragging: string | null,
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateNodes: (nodes: any) => void
-  appendToPath: (left: string, right: string) => void
-  value: any,
-  updatePath: (path: [[string, string], ...[string, string][]]) => void
-}) => {
-
-  const rightMatches = right.match(/^[\{](\w+)[\}]$/);
-
-  if (rightMatches && rightMatches[1]) {
-    const rowValue = value[rightMatches[1]]
-
-    return (<div><Input value={rowValue} /></div>)
-
-  } else {
-    return (<div> More complicated than that </div>)
-
-  }
-
-
-  
-}
-
-
 

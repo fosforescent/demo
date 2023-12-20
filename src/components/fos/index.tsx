@@ -86,8 +86,8 @@ export const MainView = ({ pathCallback }: any ) => {
     setActiveId(active.id);
   }
   
-
-  const [leftNode, rightNode] = path[0] as [string, string]
+  // console.log('path', path)
+  const [leftNode, rightNode] = path[path.length - 1] as [string, string]
 
 
   function handleDragEnd(event: DragEndEvent) {
@@ -123,7 +123,6 @@ export const MainView = ({ pathCallback }: any ) => {
   }
     
 
-
   const ScreenView = getScreenView(leftNode, nodes)
 
   return (
@@ -134,18 +133,20 @@ export const MainView = ({ pathCallback }: any ) => {
         onDragEnd={handleDragEnd}
       >
       <div className='w-full'> 
-        <div className='flex w-full'>
+        <div className='flex w-full overflow-x-scroll'>
             {path.map((item, index) => {
               
               const breadcrumbPath = path.slice(0, index + 1) as [[string, string], ...[string, string][]]
 
+              // console.log('item', item, breadcrumbPath, index, path)
+
               const handleClick = () => {
-                console.log('handleClick', breadcrumbPath)
+                console.log('handleClick', breadcrumbPath, item, index, path)
                 setPath(breadcrumbPath)
               }
 
 
-              const display = (breadcrumbPath.length === 1) ? <HomeIcon /> : JSON.stringify(breadcrumbPath[breadcrumbPath.length - 1]?.[1] as string)
+              const display = (breadcrumbPath.length === 1) ? <HomeIcon /> : JSON.stringify(breadcrumbPath[breadcrumbPath.length - 1]?.[1]?.slice(0,10) as string)
 
               return (
                 <Button key={index + 1} onClick={handleClick} variant="secondary" disabled={index === path.length - 1}>{display}</Button>

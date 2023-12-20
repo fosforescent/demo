@@ -34,7 +34,7 @@ export default async function (goalAndContext: any, taskDescription: any) {
       max_tokens: 1000,
     })
     return completion
-  } catch (error) {
+  } catch (error: any) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {
       console.error(error.response.status, error.response.data)

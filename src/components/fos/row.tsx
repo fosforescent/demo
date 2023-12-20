@@ -8,19 +8,18 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { Input } from '@/components/ui/input'
 import {
-  NameView,
   StringRow,
   TaskRow,
+  ChecklistRow,
   FolderRow,
-  FolderRowMenu,
-  CoreFolderRow,
+  ChecklistRowMenu,
 } from './rowComponents'
 
 import { Button } from "@/components/ui/button"
 
-import { ZoomComponent, ChangeInstruction } from './rowMenu'
+import { MenuComponent, ChangeInstruction } from './rowMenu'
 
-export function RowView({
+export default function RowView({
   leftNode,
   rightNode,
   dragging,
@@ -62,15 +61,9 @@ export function RowView({
     component: Row,
     menu: RowMenu,
     canZoom: canZoom,
+    allowedChildren: allowedChildren,
   } = getRowInfo(nodes, leftNode)
  
-
-
-  // console.log('roweview debug', leftNode, rightNode, nodes, updateRow, Row)
-
-  const zoom = () => {
-    updatePath([[leftNode, rightNode], ...path])
-  }
 
 
  
@@ -80,16 +73,16 @@ export function RowView({
       <div className="flex-none w-25 flex">
         <div className="flex w-100">
           <span style={{padding: '0 0 0 15px'}}>
-            <ZoomComponent zoom={zoom}>
-              <div>
-                <div className='w-60' style={{padding: '15px 0'}}>
-                  <ChangeInstruction nodes={nodes} instructionNode={leftNode} updateRow={() => {console.log('test23')}} />              
-                </div>
-                <div className='flex items-center' style={{padding: '15px 0'}}>
-                  <RowMenu valueNode={rightNode} nodes={nodes} />
-                </div>
-              </div>
-            </ZoomComponent> 
+            <MenuComponent 
+              canZoom={canZoom} 
+              leftNode={leftNode} 
+              rightNode={rightNode} 
+              path={path} 
+              updatePath={updatePath} 
+              allowedChildren={allowedChildren} 
+              rowMenuComponent={RowMenu}
+              nodes={nodes}
+              updateNodes={updateNodes} />
           </span>
           <span
             style={{
@@ -114,6 +107,49 @@ export function RowView({
 
 
 
+
+
+
+const getRowInfo = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) => {
+
+  const matchesLeft = left.match(/^[\{](\w+)[\}]$/)
+  // const matchesRight = rightNode.match(/^[\{]\w[\}]$/)
+
+
+  if (!matchesLeft || !matchesLeft?.[1]){
+    const leftNode = nodes[left]
+    throw new Error(`composite left node not implemented: ${left}(${leftNode})`)
+  }
+ 
+  const dict: {[key: string]: any} = {
+
+    "checklist": {
+      component: ChecklistRow,
+      menu: ChecklistRowMenu,
+      canZoom: true,
+      allowedChildren: ["checklist", "description"],
+    },
+
+    "description": {
+      component: StringRow,
+      menu: ChecklistRowMenu,
+      canZoom: false,
+      allowedChildren: [],
+    }
+  }
+
+  const component = dict[matchesLeft[1]]
+  if (!component) {
+    throw new Error(`no component for ${matchesLeft[1]}`)
+  }
+
+  return component
+}
+
+
+
+
+
 const AddDep = ({
 }: {
 }) => {
@@ -131,62 +167,6 @@ const AddDep = ({
     </Button>
   )
 }
-
-
-export default RowView
-
-
-
-
-const getRowInfo = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) => {
-
-  const matchesLeft = left.match(/^[\{](\w+)[\}]$/)
-  // const matchesRight = rightNode.match(/^[\{]\w[\}]$/)
-
-  console.log('leftNode', matchesLeft, !matchesLeft, !matchesLeft?.[1])
-
-  if (!matchesLeft || !matchesLeft?.[1]){
-    const leftNode = nodes[left]
-    throw new Error(`composite left node not implemented: ${left}(${leftNode})`)
-  }
- 
-  const dict: {[key: string]: any} = {
-    "folder": {
-      component: FolderRow,
-      menu: FolderRowMenu,
-      canZoom: true,
-    },
-    "coreFolder": {
-      component: CoreFolderRow,
-      menu: FolderRowMenu,
-      canZoom: true,
-    },
-    "checklist": {
-      component: TaskRow,
-      menu: FolderRowMenu,
-      canZoom: true,
-    },
-    "string": {
-      component: StringRow,
-      menu: FolderRowMenu,
-      canZoom: false,
-    },
-    "description": {
-      component: StringRow,
-      menu: FolderRowMenu,
-      canZoom: false,
-    }
-  }
-
-  const component = dict[matchesLeft[1]]
-  if (!component) {
-    throw new Error(`no component for ${matchesLeft[1]}`)
-  }
-
-  return component
-}
-
-
 
 
 

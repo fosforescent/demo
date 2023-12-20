@@ -21,9 +21,10 @@ export const useAppState = <T,>(name: string, initialValue: T) => {
 
 
   const setAppState = React.useCallback((newState: T) => {
-    // console.log('setAppState', name, newState)
+    console.log('setAppState', name, newState)
     localStorage.setItem("fosState", JSON.stringify({...state, [name]: newState}))
     setState(newState)
+    
   }, [state])
 
 
