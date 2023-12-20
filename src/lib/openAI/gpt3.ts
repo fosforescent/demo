@@ -1,5 +1,4 @@
 /* eslint camelcase: 0 */
-import { th } from 'date-fns/locale'
 import { Configuration, OpenAIApi } from 'openai'
 
 const configuration = new Configuration({

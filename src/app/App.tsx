@@ -1,5 +1,6 @@
+import './index.css'
 import './App.css'
-import './app/global.css'
+import './global.css'
 import React from 'react'
 
 import HamburgerMenu from '@/components/menu/HamburgerMenu'
