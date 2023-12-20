@@ -9,18 +9,12 @@ import { CSS } from '@dnd-kit/utilities';
 import { Input } from '@/components/ui/input'
 import {
   NameView,
-} from './rowComponents'
-
-import {
-  TaskRow
-} from './task'
-
-
-import {
-  FolderRowMenu,
+  StringRow,
+  TaskRow,
   FolderRow,
-  CoreFolderRow
-} from './folder'
+  FolderRowMenu,
+  CoreFolderRow,
+} from './rowComponents'
 
 import { Button } from "@/components/ui/button"
 
@@ -39,7 +33,7 @@ export function RowView({
   leftNode: string,
   rightNode: string,
   dragging: string | null,
-  updateNodes: (leftNode: { value?: any, content: [string, string][]}, rightNode: { value?: any, content: [string, string][]}) => void
+  updateNodes: (nodes: {[key: string]: { value?: any, content: [string, string][]}}) => void
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
   updatePath: (path: [[string, string], ...[string, string][]]) => void,
   path: [[string, string], ...[string, string][]]
@@ -64,9 +58,12 @@ export function RowView({
 
 
   
-  const Row = getRow(nodes, leftNode)
+  const {
+    component: Row,
+    menu: RowMenu,
+    canZoom: canZoom,
+  } = getRowInfo(nodes, leftNode)
  
-  const RowMenu = getRowMenu(nodes, leftNode)
 
 
   // console.log('roweview debug', leftNode, rightNode, nodes, updateRow, Row)
@@ -76,9 +73,7 @@ export function RowView({
   }
 
 
-  const updateRow = (leftValue: {value?: any, content: [string, string][]}, rightValue: {value?: any, content: [string, string][]}) => {
-    updateNodes(leftValue, rightValue)
-  }
+ 
 
   return (
     <div style={style} className="flex" ref={setNodeRef} {...attributes} {...listeners}>
@@ -106,7 +101,7 @@ export function RowView({
         </div>
       </div>
       <div className="flex-initial w-96">
-        <Row leftNode={leftNode} rightNode={rightNode} nodes={nodes} updateNodes={updateNodes} />
+        <Row leftNode={leftNode} rightNode={rightNode} nodes={nodes} updateNodes={updateNodes} path={path} />
       </div>
       {/* <div className="flex-none w-14 flex">
         <AddDep 
@@ -143,7 +138,7 @@ export default RowView
 
 
 
-const getRow = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) => {
+const getRowInfo = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) => {
 
   const matchesLeft = left.match(/^[\{](\w+)[\}]$/)
   // const matchesRight = rightNode.match(/^[\{]\w[\}]$/)
@@ -156,9 +151,31 @@ const getRow = (nodes: { [key: string]: {value?: any, content: [string, string][
   }
  
   const dict: {[key: string]: any} = {
-    "folder": FolderRow,
-    "coreFolder": CoreFolderRow,
-    "checklist": TaskRow,
+    "folder": {
+      component: FolderRow,
+      menu: FolderRowMenu,
+      canZoom: true,
+    },
+    "coreFolder": {
+      component: CoreFolderRow,
+      menu: FolderRowMenu,
+      canZoom: true,
+    },
+    "checklist": {
+      component: TaskRow,
+      menu: FolderRowMenu,
+      canZoom: true,
+    },
+    "string": {
+      component: StringRow,
+      menu: FolderRowMenu,
+      canZoom: false,
+    },
+    "description": {
+      component: StringRow,
+      menu: FolderRowMenu,
+      canZoom: false,
+    }
   }
 
   const component = dict[matchesLeft[1]]
@@ -170,74 +187,6 @@ const getRow = (nodes: { [key: string]: {value?: any, content: [string, string][
 }
 
 
-const getRowMenu = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) =>  {
-
-  return FolderRowMenu
-}
 
 
-
-
-
-
-
-const NameRow = ({
-  left,
-  right,
-  dragging, 
-  nodes,
-  updateNodes,
-  appendToPath,
-  value,
-  updatePath,
-} : {
-  left: string,
-  right: string,
-  dragging: string | null,
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateNodes: (nodes: any) => void
-  appendToPath: (left: string, right: string) => void
-  value: any,
-  updatePath: (path: [[string, string], ...[string, string][]]) => void
-}) => {
-
-  const rightMatches = right.match(/^[\{](\w+)[\}]$/);
-
-  if (rightMatches && rightMatches[1]) {
-    const rowValue = value[rightMatches[1]]
-
-    return (<div><Input value={rowValue} /></div>)
-
-  } else {
-    return (<div> More complicated than that </div>)
-
-  }
-
-
-  
-}
-
-
-const ChecklistRow = ({
-  left,
-  right,
-  dragging, 
-  nodes,
-  updateNodes,
-  appendToPath,
-  value,
-} : {
-  left: string,
-  right: string,
-  dragging: string | null,
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateNodes: (nodes: any) => void
-  appendToPath: (left: string, right: string) => void
-  value: any,
-}) => {
-
-
-
-  return (<div>test</div>)
-}
 

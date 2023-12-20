@@ -43,13 +43,13 @@ export function RootScreenView({
 
   const screenHeadProps = getScreenHeadProps(rightNode, nodes)
 
- 
 
   const rows = nodes[rightNode]?.content
   const value = nodes[rightNode]?.value
 
   if (!rows) {
-    throw new Error(`now rows for ${rightNode}... shouldn't have gotten here`)
+    console.log('screenprops', leftNode, rightNode, nodes)
+    throw new Error(`no rows for ${rightNode}... shouldn't have gotten here`)
   }
 
   const items = rows.map((edge: any) => ({
