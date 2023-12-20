@@ -55,10 +55,10 @@ export const MenuOverlayComponent = ({
       </SheetHeader>
         <div>
           <div className='w-60' style={{padding: '15px 0'}}>
-            <ChangeInstruction nodes={nodes} leftNode={leftNode} rightNode={rightNode} updateNodes={updateNodes} path={path} allowedChildren={allowedChildren} />              
+            <ChangeInstruction nodes={nodes} leftNode={leftNode} rightNode={rightNode} updateNodes={updateNodes} path={path} allowedChildren={allowedChildren} setMenuOpen={setMenuOpen}/>              
           </div>
           <div className='flex items-center' style={{padding: '15px 0'}}>
-            <RowMenu rightNode={rightNode} leftNode={leftNode} path={path} nodes={nodes} updateNodes={updateNodes} />
+            <RowMenu rightNode={rightNode} leftNode={leftNode} path={path} nodes={nodes} updateNodes={updateNodes} setMenuOpen={setMenuOpen} />
           </div>
         </div>
     </SheetContent>
@@ -155,7 +155,8 @@ export const ChangeInstruction = ({
   rightNode,
   updateNodes,
   path,
-  allowedChildren
+  allowedChildren,
+  setMenuOpen,
   // updatePath,
 }: {
   leftNode: string,
@@ -165,6 +166,7 @@ export const ChangeInstruction = ({
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
   updateNodes: (nodes: {[key: string]: { value?: any, content: [string, string][]}}) => void
   allowedChildren: string[]
+  setMenuOpen: (open: boolean) => void
 }) => {
 
 
@@ -179,6 +181,7 @@ export const ChangeInstruction = ({
       }
       const newContent = parentNode.content.map((item) => (item[0] === leftNode && item[1] === rightNode) ? [newLeft, item[1]] as [string, string] : item)
       updateNodes({...nodes, [parentRight]: {...parentNode, content: newContent } })
+      setMenuOpen(false)
   }
 
   const valueItems = allowedChildren.map((item) => {

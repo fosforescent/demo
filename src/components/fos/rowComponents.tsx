@@ -80,7 +80,7 @@ export const StringRow = ({
   }
 
 
-  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} /></div>)
+  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} className="text-base" /></div>)
 
 }
 
@@ -129,7 +129,7 @@ export const ChecklistRow = ({
   }
 
  
-  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} /></div>)
+  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} className="text-base" /></div>)
 
 }
 
@@ -217,6 +217,7 @@ export const ChecklistRowMenu = ({
   updateNodes,
   path,
   // updatePath,
+  setMenuOpen,
 }: {
   leftNode: string,
   rightNode: string,
@@ -224,6 +225,7 @@ export const ChecklistRowMenu = ({
   // updatePath: (path: [[string, string], ...[string, string][]]) => void
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
   updateNodes: (nodes: {[key: string]: { value?: any, content: [string, string][]}}) => void
+  setMenuOpen: (open: boolean) => void
 }) => {
 
   const deleteNode = () => {
@@ -234,6 +236,7 @@ export const ChecklistRowMenu = ({
     }
     const newContent = parentNode.content.filter((item) => item[0] !== leftNode || item[1] !== rightNode)
     updateNodes({...nodes, [parentRight]: {...parentNode, content: newContent } })
+    setMenuOpen(false)
   }
 
   const snipNode = () => {
@@ -253,6 +256,7 @@ export const ChecklistRowMenu = ({
       ...thisContent
     ]
     updateNodes({...nodes, [parentRight]: {...parentNode, content: newContent } })
+    setMenuOpen(false)
 
   }
 
@@ -299,8 +303,8 @@ export const FolderRow = ({
   const numItems = valueNode.content.length
 
   return (<div className="flex">
-    <div style={{padding: '10px 10px 10px 0', position: 'relative', fontSize: '.7rem'}}><Folder style={{position: 'absolute', top: 5, left: -10, width: '25px', height: '25px' }} />{numItems}</div>
-    <Input type="text" placeholder="" onChange={(e) => updateValue(e.target.value)} value={name} />
+    <div style={{padding: '10px 10px 10px 0', position: 'relative'}}><Folder style={{position: 'absolute', top: 5, left: -10, width: '25px', height: '25px' }} />{numItems}</div>
+    <Input type="text" placeholder="" onChange={(e) => updateValue(e.target.value)} value={name} className='text-base'  />
   </div>)
 }
 
