@@ -5,12 +5,13 @@ import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { TrashIcon, PlayIcon, Folder } from "lucide-react"
 import { QuestionMarkCircledIcon, ComponentNoneIcon } from "@radix-ui/react-icons"
+import { th } from "date-fns/locale"
 
 export const FolderRowMenu = ({ 
   valueNode,
   nodes
 }: {
-  valueNode: {value?: any, content: [string, string][] },
+  valueNode: string ,
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
 }) => {
 
@@ -24,15 +25,20 @@ export const FolderRowMenu = ({
 
 
 export const FolderRow = ({
-  valueNode,
+  valueNodeId,
   nodes
 }: {
-  valueNode: {value?: any, content: [string, string][] },
+  valueNodeId: string,
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
 }) => {
 
   const updateValue = (newVal: string) => {
     console.log('thest1')
+  }
+
+  const valueNode = nodes[valueNodeId]
+  if(!valueNode){
+    throw new Error('no value node')
   }
 
   console.log('valueNode', valueNode)

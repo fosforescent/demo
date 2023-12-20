@@ -1,22 +1,10 @@
 'use client'
 
-import React, { ReactElement, useEffect } from 'react'
+import React from 'react'
 import { Crosshair1Icon, DiscIcon, QuestionMarkCircledIcon, PlayIcon, DragHandleDots2Icon, DotsVerticalIcon, ComponentNoneIcon, TrashIcon, PlusCircledIcon  } from '@radix-ui/react-icons'
-import { Button } from "@/components/ui/button"
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetClose
-} from "@/components/ui/sheet"
-
-import useLongPress from '../long-press'
 
 import { Input } from '@/components/ui/input'
 import {
@@ -33,24 +21,29 @@ import {
   FolderRow,
   CoreFolderRow
 } from './folder'
-import { SearchIcon, Check, Plus} from 'lucide-react';
 
-import { cn } from '@/lib/utils'
+import { Button } from "@/components/ui/button"
+
+import { ZoomComponent, ChangeInstruction } from './rowMenu'
 
 export function RowView({
   leftNode,
   rightNode,
   dragging,
-  updateRow,
+  updateNodes,
   nodes,
-  zoom
+  updatePath,
+  path,
+  value,
 }: {
   leftNode: string,
   rightNode: string,
   dragging: string | null,
-  updateRow: (leftNode: { value?: any, content: [string, string][]}, rightNode: { value?: any, content: [string, string][]}) => void
+  updateNodes: (leftNode: { value?: any, content: [string, string][]}, rightNode: { value?: any, content: [string, string][]}) => void
   nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  zoom: () => void
+  updatePath: (path: [[string, string], ...[string, string][]]) => void,
+  path: [[string, string], ...[string, string][]]
+  value: any,
 }) {
   // const [showTree, setShowTree] = React.useState(true)
 
@@ -70,38 +63,22 @@ export function RowView({
   };
 
 
-
-
-  if (leftNode === 'nativeInstruction') {
-
-  }
-
-  if (rightNode === 'nativeValue') {
-    console.log('herenv')
-  }
-
-
-
-
-  const leftNodeObj = nodes[leftNode] ? nodes[leftNode] : null
-  const rightNodeObj = nodes[rightNode] ? nodes[rightNode] : null
-
-  if (!leftNodeObj || !rightNodeObj) {
-    console.log('nodes', nodes)
-    throw new Error(`missing node: l(${leftNode}) r(${rightNode})`)
-  }
-
-
-  // console.log('leftNodeObj', leftNodeObj)
-  // console.log('rightNodeObj', rightNodeObj)
+  
+  const Row = getRow(nodes, leftNode)
  
-  const Row = getRow(leftNodeObj)
- 
-  const RowMenu = getRowMenu(leftNodeObj)
+  const RowMenu = getRowMenu(nodes, leftNode)
 
 
   // console.log('roweview debug', leftNode, rightNode, nodes, updateRow, Row)
 
+  const zoom = () => {
+    updatePath([[leftNode, rightNode], ...path])
+  }
+
+
+  const updateRow = (leftValue: {value?: any, content: [string, string][]}, rightValue: {value?: any, content: [string, string][]}) => {
+    updateNodes(leftValue, rightValue)
+  }
 
   return (
     <div style={style} className="flex" ref={setNodeRef} {...attributes} {...listeners}>
@@ -111,10 +88,10 @@ export function RowView({
             <ZoomComponent zoom={zoom}>
               <div>
                 <div className='w-60' style={{padding: '15px 0'}}>
-                  <ChangeInstruction nodes={nodes} instructionNode={leftNodeObj} updateRow={() => {console.log('test23')}} />              
+                  <ChangeInstruction nodes={nodes} instructionNode={leftNode} updateRow={() => {console.log('test23')}} />              
                 </div>
                 <div className='flex items-center' style={{padding: '15px 0'}}>
-                  <RowMenu valueNode={rightNodeObj} nodes={nodes} />
+                  <RowMenu valueNode={rightNode} nodes={nodes} />
                 </div>
               </div>
             </ZoomComponent> 
@@ -129,7 +106,7 @@ export function RowView({
         </div>
       </div>
       <div className="flex-initial w-96">
-        <Row leftNode={leftNodeObj} rightNode={rightNodeObj} nodes={nodes} updateRow={updateRow} />
+        <Row leftNode={leftNode} rightNode={rightNode} nodes={nodes} updateNodes={updateNodes} />
       </div>
       {/* <div className="flex-none w-14 flex">
         <AddDep 
@@ -161,120 +138,106 @@ const AddDep = ({
 }
 
 
-const MenuComponent = ({
-  open,
-  setMenuOpen,
-  content
-}: {
-  open: boolean
-  setMenuOpen: (open: boolean) => void
-  content: ReactElement
-}) => {
-
-return (  
-<Sheet  open={open} onOpenChange={setMenuOpen}>
-  <SheetContent  side={"left"}>
-      <SheetHeader>
-        Actions
-      </SheetHeader>
-      <SheetDescription>
-      {content}
-      </SheetDescription>
-    </SheetContent>
-  </Sheet>)
-
-}
-
-
-function ZoomComponent({
-  children,
-  zoom,
-}: {
-  children: ReactElement
-  zoom: () => void
-}) {
-
-  const [menuOpen, setMenuOpen] = React.useState(false)
-
-
-  const onLongPress = () => {
-    setMenuOpen(true)
-  }
-  
-  const onClick = () => {
-    zoom()
-    console.log('clicked')
-  }
-
-  const defaultOptions = {
-    shouldPreventDefault: true,
-    delay: 500,
-  };
-
-  const longPressEvent = useLongPress(onLongPress, onClick, defaultOptions);
-
-  return (
-    <>      
-      <MenuComponent open={menuOpen} setMenuOpen={setMenuOpen} content={children} />
-      <Button
-        variant={"secondary"}
-        style={{ background: 'transparent', padding: '10px 10px 10px 0px'}}
-        {...longPressEvent}
-      >
-      <DiscIcon  />
-      </Button>
-
-    </>
-  )
-}
-
 export default RowView
 
 
 
-const ChangeInstruction = ({
-  instructionNode,
-  nodes,
-  updateRow
-}: {
-  instructionNode: {value?: any, content: [string, string][] },
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateRow: (leftNode: string, rightNode: string) => void
-}) => {
 
-  const values = ["folder", "task"]
+const getRow = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) => {
 
+  const matchesLeft = left.match(/^[\{](\w+)[\}]$/)
+  // const matchesRight = rightNode.match(/^[\{]\w[\}]$/)
 
-  return (<div className="flex join-horizontal items-center">
-    <Button variant="secondary" className='rounded-l-lg rounded-r-none'><SearchIcon /></Button>
-    <Input placeholder='test' className='rounded-none'/>
-    <Button variant="secondary" className='rounded-r-lg rounded-l-none'><Plus /></Button>
-  </div>)
-}
+  console.log('leftNode', matchesLeft, !matchesLeft, !matchesLeft?.[1])
 
-
-const getRow = (leftNode: {value?: any, content: [string, string][] }) => {
-
-  const nativeInstructions = leftNode.content.filter((edge: any) => edge[0] === "nativeInstruction")
-  const nativeInstruction = nativeInstructions.length > 0 ? nativeInstructions[0] ? nativeInstructions[0][1] : null : null
-  // if (!nativeInstruction) {
-  //   throw new Error(`missing nativeInstruction: ${JSON.stringify(leftNode)}}`)
-  // }
-  // console.log('nativeInstruction', nativeInstruction)
+  if (!matchesLeft || !matchesLeft?.[1]){
+    const leftNode = nodes[left]
+    throw new Error(`composite left node not implemented: ${left}(${leftNode})`)
+  }
+ 
   const dict: {[key: string]: any} = {
     "folder": FolderRow,
     "coreFolder": CoreFolderRow,
-    "task": TaskRow,
+    "checklist": TaskRow,
   }
 
+  const component = dict[matchesLeft[1]]
+  if (!component) {
+    throw new Error(`no component for ${matchesLeft[1]}`)
+  }
 
-  const component = nativeInstruction ? dict[nativeInstruction] || TaskRow : TaskRow
-  // console.log('component', component, nativeInstruction)
   return component
 }
 
 
-const getRowMenu = (leftNode: {value?: any, content: [string, string][] }) =>  {
+const getRowMenu = (nodes: { [key: string]: {value?: any, content: [string, string][] }}, left: string) =>  {
 
   return FolderRowMenu
 }
+
+
+
+
+
+
+
+const NameRow = ({
+  left,
+  right,
+  dragging, 
+  nodes,
+  updateNodes,
+  appendToPath,
+  value,
+  updatePath,
+} : {
+  left: string,
+  right: string,
+  dragging: string | null,
+  nodes: {[key: string]: { value?: any, content: [string, string][]}}
+  updateNodes: (nodes: any) => void
+  appendToPath: (left: string, right: string) => void
+  value: any,
+  updatePath: (path: [[string, string], ...[string, string][]]) => void
+}) => {
+
+  const rightMatches = right.match(/^[\{](\w+)[\}]$/);
+
+  if (rightMatches && rightMatches[1]) {
+    const rowValue = value[rightMatches[1]]
+
+    return (<div><Input value={rowValue} /></div>)
+
+  } else {
+    return (<div> More complicated than that </div>)
+
+  }
+
+
+  
+}
+
+
+const ChecklistRow = ({
+  left,
+  right,
+  dragging, 
+  nodes,
+  updateNodes,
+  appendToPath,
+  value,
+} : {
+  left: string,
+  right: string,
+  dragging: string | null,
+  nodes: {[key: string]: { value?: any, content: [string, string][]}}
+  updateNodes: (nodes: any) => void
+  appendToPath: (left: string, right: string) => void
+  value: any,
+}) => {
+
+
+
+  return (<div>test</div>)
+}
+

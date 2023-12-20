@@ -1,7 +1,5 @@
 import React from 'react'
-import { Fos } from '@/fos'
 import Wrapper from './wrapper'
-import { set } from 'date-fns'
 
 
 type MainOptions = {

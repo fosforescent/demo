@@ -1,6 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react'
 import Row from './row'
-import { IStore } from '@/fos'
 import { Crosshair1Icon, DiscIcon, QuestionMarkCircledIcon, PlayIcon, DragHandleDots2Icon, DotsVerticalIcon, ComponentNoneIcon, TrashIcon, PlusCircledIcon, MinusIcon, PlusIcon  } from '@radix-ui/react-icons'
 
 // import { TreeIcon } from '@radix-ui/react-icons'
@@ -74,13 +73,23 @@ export function RootScreenView({
       {items.length > 0 ? 
         items.map((item, index) => {
 
-          const RowComponent = getScreenRow(item.left, nodes)
 
           const rowProps = getScreenRowProps(item.right, nodes)
 
           return (
             // <RowComponent key={index} nodes={nodes} left={leftNode} right={rightNode} dragging={dragging} blank={false} updateRow={updateNodes} />
-            <RowComponent key={index} {...rowProps} updateNodes={updateNodes} dragging={dragging} value={value} nodes={nodes} updatePath={updatePath} leftNode={item.left} rightNode={item.right} />
+            <RowView 
+              key={index} 
+              {...rowProps} 
+              updateNodes={updateNodes} 
+              dragging={dragging} 
+              value={value} 
+              nodes={nodes} 
+              updatePath={updatePath} 
+              leftNode={item.left} 
+              rightNode={item.right} 
+              path={path}
+              />
           )
         })
         : <AddRow  />      
@@ -137,93 +146,11 @@ const getScreenHeadProps = (rightNode: string, nodes: {[key: string]: {value?: a
 }
 
 
-const getScreenRow = (leftNode: string, nodes: {[key: string]: {value?: any, content: [string, string][] }}) =>  {
 
-  const leftMatches = leftNode.match(/^[\{](\w+)[\}]$/);
-  console.log('here match', leftMatches)
-
-
-  if (leftMatches && leftMatches[1]) {
-    if (leftMatches[1] === 'name') {
-      return NameRow
-    }else if (leftMatches[1] === 'checklist') {
-      return RowView
-    }
-    
-  }else{ // left not native
-    throw new Error(`dynamic left nodes not implemented yet ${JSON.stringify(leftNode)}}`)
-  }
-
-
-
-  return RowView
-}
 
 const getScreenRowProps = (rightNode: string, nodes: {[key: string]: {value?: any, content: [string, string][] }}) =>  {
 
   return {}
-}
-
-
-
-
-
-const NameRow = ({
-  left,
-  right,
-  dragging, 
-  nodes,
-  updateNodes,
-  appendToPath,
-  value,
-  updatePath,
-} : {
-  left: string,
-  right: string,
-  dragging: string | null,
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateNodes: (nodes: any) => void
-  appendToPath: (left: string, right: string) => void
-  value: any,
-  updatePath: (path: [[string, string], ...[string, string][]]) => void
-}) => {
-
-  const rightMatches = right.match(/^[\{](\w+)[\}]$/);
-
-  if (rightMatches && rightMatches[1]) {
-    const rowValue = value[rightMatches[1]]
-
-    return (<div><Input value={rowValue} /></div>)
-
-  } else {
-    return (<div> More complicated than that </div>)
-
-  }
-
-
-  
-}
-
-
-const ChecklistRow = ({
-  left,
-  right,
-  dragging, 
-  nodes,
-  updateNodes,
-  appendToPath,
-} : {
-  left: string,
-  right: string,
-  dragging: string | null,
-  nodes: {[key: string]: { value?: any, content: [string, string][]}}
-  updateNodes: (nodes: any) => void
-  appendToPath: (left: string, right: string) => void
-}) => {
-
-
-
-  return (<div>test</div>)
 }
 
 
