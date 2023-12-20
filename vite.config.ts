@@ -7,6 +7,13 @@ import svgr from 'vite-plugin-svgr'
 export default defineConfig(() => {
   return {
     build: {
+      rollupOptions: {
+        output: {
+          entryFileNames: `[name].[hash].js`, // Flatten JS output
+          chunkFileNames: `[name].[hash].js`, // Flatten chunked JS
+          assetFileNames: `[name].[hash].[ext]` // Flatten other assets
+        },
+      },
       outDir: 'build',
     },
     plugins: [react(), viteTsconfigPaths(), svgr({ svgrOptions: { icon: true } })],
