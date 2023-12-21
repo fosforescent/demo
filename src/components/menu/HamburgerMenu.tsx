@@ -1,16 +1,6 @@
 import React, { useState } from 'react'
 
-import { Moon, Sun } from "lucide-react"
-
-import { useTheme } from "@/components/theme-provider"
- 
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { useAppState } from '@/components/app-state'
  
 import {
   Sheet,
@@ -21,52 +11,20 @@ import {
   SheetTrigger,
   SheetClose
 } from "@/components/ui/sheet"
+import { Input } from '../ui/input'
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from "@/components/ui/command"
-
-export function ModeToggle() {
-  const { setTheme } = useTheme()
- 
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}
 
 
 const HamburgerMenu = () => {
   const [menuOpen, setMenuOpen] = useState(false)
 
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen)
+
+  const [token, setToken] = React.useState(localStorage.getItem("token") || "");
+
+  const updateToken = (e: any) => {
+    localStorage.setItem("token", e.target.value)
+    setToken(e.target.value)
   }
 
   return (
@@ -77,56 +35,12 @@ const HamburgerMenu = () => {
       <SheetHeader>
         Fos
       </SheetHeader>
-      <nav>
-              <Command>
-                <CommandInput placeholder="Type a command or search..." />
-                <CommandList>
-                  <CommandEmpty>No results found.</CommandEmpty>
-                  <CommandGroup heading="Navigation">
-                    <CommandItem>
-                      <SheetClose asChild>
-                   <a href='/todo' onClick={toggleMenu}>
-                      Inbox
-                    </a>
-                                </SheetClose>
-                    </CommandItem>
-                    <CommandItem>
-                                <SheetClose asChild>
-                   <a href='/workflow' onClick={toggleMenu}>
-                     Workflows 
-                    </a>
-                                </SheetClose>
-                    </CommandItem>
-                    {/* <CommandItem>
-                                <SheetClose asChild>
-                   <Link href='/calendar' onClick={toggleMenu}>
-                      Calendar
-                    </Link>
-                                </SheetClose>
-                    </CommandItem> */}
-                  </CommandGroup>
-                  <CommandSeparator />
-                  <CommandGroup heading="Actions">
-                    {/* <CommandItem>
-                                <SheetClose asChild>
-                      <Link href='/' onClick={toggleMenu}>
-                        Home
-                      </Link>
-                                </SheetClose>
-                    </CommandItem> */}
-                    <CommandItem>
-                                <SheetClose asChild>
-
-                      <a href='/login' onClick={() => { toggleMenu(); localStorage.clear(); window.location.reload()}}>
-                        Logout 
-                      </a>
-                                </SheetClose>
-                    </CommandItem>
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-     </nav>
-          <ModeToggle />
+      <SheetTitle>
+        Settings
+      </SheetTitle>
+      <div className='padding-lg'>
+        <Input placeholder="openai token" value={token} onChange={updateToken} />
+      </div>
     </SheetContent>
   </Sheet> 
   </div>

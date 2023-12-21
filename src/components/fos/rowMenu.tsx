@@ -130,6 +130,7 @@ export function MenuComponent({
         <Button
           variant={"secondary"}
           style={{ background: 'transparent', padding: '10px 10px 10px 0px'}}
+          onKeyDown={(e: any) => { e.stopPropagation(); setMenuOpen(true);}}
           {...longPressEvent}
           >
         <DiscIcon  />

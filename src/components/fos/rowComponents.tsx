@@ -57,12 +57,10 @@ export const StringRow = ({
   const [timer, setTimer] = useState(0);
   useEffect(() => {
     let handler: any = null
-    console.log('timer', timer)
     if (timer > 0) {
       handler = setTimeout(() => setTimer(timer + 1), 100)
     } 
     if (timer > 10) {
-      console.log('saveText', textState)
       saveText(null)
       setTimer(0)
     }
@@ -70,17 +68,17 @@ export const StringRow = ({
   }, [timer])
   
   const changeText = (e: any ) => {
-    console.log('changeText', e.target.value)
     setTextState(e.target.value)
     setTimer(1)
   }
 
   const saveText = (e: any ) => {
+    e?.preventDefault()
     updateNodes({...nodes, [parentRight]:  {...parentNode, value: { [valueKey]: textState } } })
   }
 
 
-  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} className="text-base" /></div>)
+  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} onKeyDown={(e: any) => e.stopPropagation()} className="text-base" /></div>)
 
 }
 
@@ -125,11 +123,12 @@ export const ChecklistRow = ({
   }
 
   const saveText = (e: any ) => {
+    e?.preventDefault()
     updateNodes({...nodes, [rightNode]:  {...rightNodeObj, value: { ...value, description: textState } } })
   }
 
  
-  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} className="text-base" /></div>)
+  return (<div className='flex justify-center'><Input type="text" placeholder="" onChange={changeText} value={textState} onBlur={saveText} onKeyDown={(e: any) => e.stopPropagation()} className="text-base" /></div>)
 
 }
 

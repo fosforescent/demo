@@ -15,6 +15,7 @@ import { Input } from '../ui/input';
 
 import RowView from './row';
 
+import { suggest } from '@/lib/suggest'
 
 export function RootScreenView({
   nodes,
@@ -40,7 +41,6 @@ export function RootScreenView({
 
   const [leftNodeA, rightNodeA] = path[path.length - 1] as [string, string]
 
-  console.log('leftNodeA', leftNodeA, rightNodeA, leftNode, rightNode, path)
 
   const ScreenHeadComponent = getScreenHead(leftNode, nodes)
 
@@ -106,7 +106,7 @@ export function RootScreenView({
 
   return (<div>
      <div style={{padding: '15px 0px'}}>
-       <ScreenHeadComponent {...screenHeadProps} />
+       <ScreenHeadComponent leftNode={leftNode} rightNode={rightNode} nodes={nodes} updateNodes={updateNodes} path={path} />
           {/* <AddOption /> */}
       </div>
       <SortableContext 
@@ -204,7 +204,20 @@ const getScreenRowProps = (rightNode: string, nodes: {[key: string]: {value?: an
 
 
 
-const RootScreenHead = (props: any) => {
+const RootScreenHead = ({  
+  leftNode,
+  rightNode,
+  path,
+  nodes,
+  updateNodes
+
+}: {
+  leftNode: string
+  rightNode: string
+  path: [[string, string], ...[string, string][]],
+  nodes: {[key: string]: { value?: any, content: [string, string][]}}
+  updateNodes: (nodes: {[key: string]: { value?: any, content: [string, string][]}}) => void
+}) => {
 
 
   /**
@@ -219,6 +232,20 @@ const RootScreenHead = (props: any) => {
   const changeName = (name: string) => {
     console.log('changeName', name)
   }
+    
+
+  const parentNodeObj = nodes[rightNode]
+
+  if (!parentNodeObj) {
+    throw new Error(`no right node for ${rightNode}`)
+  }
+
+  const hasDescription = parentNodeObj.content.filter((edge: [string, string]) => edge[0] === "{description}").length > 0
+  const canSuggest = !!localStorage.getItem('token') && hasDescription
+    
+  const handleSuggest = () => {
+    suggest(path, rightNode, nodes, updateNodes)
+  }
 
   return (<>
     <div style={{padding: "10px 0"}}>
@@ -229,7 +256,7 @@ const RootScreenHead = (props: any) => {
       {/* <div style={{padding: "10px 0"}}>
         <Input placeholder="" value={""} onChange={(e) => changeName(e.target.value)} />
       </div> */}
-        <Button variant={"secondary"} className='bg-emerald-900'><QuestionMarkCircledIcon /></Button>
+        <Button variant={"secondary"} className='bg-emerald-900' disabled={!canSuggest} onClick={handleSuggest}><QuestionMarkCircledIcon /></Button>
         <Button variant={"secondary"} className='bg-emerald-900'><PlayIcon /></Button>
     </>)}
     </div>

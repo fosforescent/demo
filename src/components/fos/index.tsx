@@ -40,7 +40,7 @@ export const MainView = ({ pathCallback }: any ) => {
  
 
   const updateNodes = (newNodes: any) => {
-    console.log('updateNodes', newNodes)
+    // console.log('updateNodes', newNodes)
     /**
      * typecheck nodes before saving --- 
      * 

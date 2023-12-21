@@ -83,6 +83,7 @@ export default function RowView({
               rowMenuComponent={RowMenu}
               nodes={nodes}
               updateNodes={updateNodes} />
+              
           </span>
           <span
             style={{
