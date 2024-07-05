@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 
 import FosReact from '@fosforescent/react-client'
 import { promptGPT } from '@/lib/promptGPT'
+import { Toaster } from '@/components/ui/toaster'
+import { useToast } from '@/components/ui/use-toast'
 
 function App() {
 
@@ -21,6 +23,7 @@ function App() {
   }
 
 
+  const { toast } = useToast()
   
   // const options: FosReactOptions = {
   //   canPromptGPT,
@@ -36,6 +39,7 @@ function App() {
   // }
 
   const hasToken = !!localStorage.getItem('token')
+  console.log('hasToken', hasToken, promptGPT)
 
   return (
     <div className="App" style={{ height: '100%', width: '100%', position: 'relative', touchAction: 'none', textAlign: 'center', margin: '0 auto' }}>
@@ -48,10 +52,12 @@ function App() {
                 setData={setDataWithLog}
                 options={{
                   canPromptGPT: hasToken,
-                  promptGPT: promptGPT
+                  promptGPT: promptGPT,
+                  toast
                 }}
                 />
             </div>
+            <Toaster />
           </div>
         </ThemeProvider>
     </div>
